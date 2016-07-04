@@ -1,0 +1,14 @@
+FROM progrium/busybox
+
+# Install the pre-requsite to bootstrap the installation
+RUN opkg-install python-pip 
+
+RUN mkdir -p /app
+ADD dist/dist.tar.gz /app
+RUN ls -lR /app
+RUN pip install /app/dist/Namer-Service*.tar.gz
+
+WORKDIR /app
+
+CMD python -c "import namer_service; namer_service.flask_app.run(host='0.0.0.0')"
+

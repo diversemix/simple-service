@@ -1,0 +1,20 @@
+FROM progrium/busybox
+
+# Set up the environment within the container ready for building.
+#
+RUN mkdir -p /tmp/build/src
+RUN opkg-install python-pip 
+RUN pip install setuptools
+
+# Now add all the files needed for the build
+#
+ADD ./namer_service /tmp/build/namer_service
+ADD setup.py /tmp/build
+
+# Run the build command
+WORKDIR /tmp/build
+RUN python setup.py sdist
+
+# When the image is run the dist folder is tar'ed and spat out.
+CMD tar cvf - dist/
+
