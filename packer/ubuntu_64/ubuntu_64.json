@@ -1,0 +1,57 @@
+{
+    "variables": {
+        "ssh_name": "developer",
+        "ssh_pass": "developer",
+        "hostname": "packer-test",
+        "compression_level": "6",
+        "cpus": "1",
+        "disk_size": "40000",
+        "headless": "false",
+        "memory": "512",
+        "mirror": "http://releases.ubuntu.com",
+        "ssh_timeout": "60m"
+    },
+
+    "builders": [{
+        "type": "virtualbox-iso",
+        "guest_os_type": "Ubuntu_64",
+
+        "vboxmanage": [
+            ["modifyvm", "{{.Name}}", "--vram", "32"]
+        ],
+
+
+        "iso_url": "{{user `mirror`}}/15.10/ubuntu-15.10-desktop-amd64.iso",
+        "iso_checksum": "cc991993e3d9f57f27199877ac416157228fe6896212968d6e8c5aebd74e7ab0",
+        "iso_checksum_type": "sha256",
+
+        "output_directory": "output-ubuntu-15.10-amd64",
+        "vm_name": "packer-ubuntu-15.10-amd64",
+        "disk_size": "{{user `disk_size`}}",
+        "headless": "{{user `headless`}}",
+
+        "http_directory" : ".",
+        "http_port_min" : 9001,
+        "http_port_max" : 9001,
+
+        "ssh_username": "{{user `ssh_name`}}",
+        "ssh_password": "{{user `ssh_pass`}}",
+        "ssh_wait_timeout": "20m",
+
+        "shutdown_command": "sudo systemctl poweroff",
+
+        "boot_wait": "3s",
+        "boot_command": [
+          "<esc><enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+          "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",          "/install/vmlinuz ",
+          "initrd=/install/initrd.gz ",
+          "net.ifnames=0 ",
+          "auto-install/enable=true ",
+          "debconf/priority=critical ",
+          "preseed/url=http://{{.HTTPIP}}:{{.HTTPPort}}/preseed.cfg ",
+          "<enter>"
+        ]
+    }]
+}
